@@ -21,10 +21,13 @@ resource "aws_instance" "roach_instance" {
 }
 
 resource "null_resource" "bastion-runner" {
+
+  depends_on = [null_resource.cockroach-runner]
+
   connection {
     type = "ssh"
     user = "ubuntu"
-    private_key = "${file("/home/abhilash/.ssh/yulu_assignment.pem")}"
+    private_key = "${file("~/.ssh/yulu_assignment.pem")}"
     host = "${aws_eip.bastion_eip.public_ip}"
   }
 
@@ -53,11 +56,11 @@ resource "null_resource" "cockroach-runner" {
   connection {
     type = "ssh"
     user = "ubuntu"
-    private_key = "${file("/home/abhilash/.ssh/yulu_assignment.pem")}"
+    private_key = "${file("~/.ssh/yulu_assignment.pem")}"
     host = "${element(aws_instance.roach_instance.*.private_ip, count.index)}"
     bastion_host = "${aws_eip.bastion_eip.public_ip}"
     bastion_user = "ubuntu"
-    bastion_private_key = "${file("/home/abhilash/.ssh/yulu_assignment.pem")}"
+    bastion_private_key = "${file("~/.ssh/yulu_assignment.pem")}"
   }
 
   provisioner "file" {
