@@ -74,7 +74,7 @@ resource "aws_lb_target_group" "roach_service_tg" {
 # }
 
 resource "aws_lb_target_group_attachment" "roach_service_tg_attachment" {
-  count = 3
+  count = "${var.num_of_instances}"
   target_group_arn = "${aws_lb_target_group.roach_service_tg.arn}"
   target_id        = "${element(aws_instance.roach_instance.*.id, count.index)}"
   port             = 26257

@@ -62,19 +62,12 @@ variable "cockroach_binary" {
   default = ""
 }
 
-# Name of the ssh key pair to use for GCE instances.
-# The public key will be passed at instance creation, and the private
-# key will be used by the local ssh client.
-#
-# The path is expanded to: ~/.ssh/<key_name>.pub
-#
-# If you use `gcloud compute ssh` or `gcloud compute copy-files`, you may want
-# to leave this as "google_compute_engine" for convenience.
-variable "key_name" {
-  default = "google_compute_engine"
-}
-
 # SHA of the cockroach binary to pull down. If none, the latest is fetched.
 variable "cockroach_sha" {
   default = ""
+}
+
+# Number of instances to start.
+variable "num_instances" {
+  default = 3
 }

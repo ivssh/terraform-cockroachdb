@@ -6,7 +6,7 @@ provider "aws" {
 
 
 resource "aws_instance" "roach_instance" {
-  count = 3
+  count = "${var.num_of_instances}"
   ami                    = "ami-009110a2bf8d7dd0a"
   instance_type          = "t3.large"
   subnet_id              = "${aws_subnet.private_subnet_1.id}"
@@ -49,7 +49,7 @@ resource "null_resource" "bastion-runner" {
 }
 
 resource "null_resource" "cockroach-runner" {
-  count = 3
+  count = "${var.num_of_instances}"
 
   depends_on = [aws_eip.bastion_eip]
 
