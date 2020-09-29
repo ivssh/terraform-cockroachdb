@@ -20,6 +20,31 @@ resource "aws_instance" "roach_instance" {
   }
 }
 
+resource "null_resource" "bastion-runner" {
+  connection {
+    type = "ssh"
+    user = "ubuntu"
+    private_key = "${file("/home/abhilash/.ssh/yulu_assignment.pem")}"
+    host = "${aws_eip.bastion_eip.public_ip}"
+  }
+
+  provisioner "file" {
+    source = "download_binary.sh"
+    destination = "/home/ubuntu/download_binary.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt-get -y update",
+      "sudo apt-get -y install nethogs",
+      "mkdir -p logs",
+      "chmod 755 cockroach",
+      "[ $(stat --format=%s cockroach) -ne 0 ] || sudo bash download_binary.sh cockroach/cockroach ${var.cockroach_sha}",
+      "cockroach init --insecure --host=${aws_instance.roach_instance[0].private_ip}"
+    ]
+  }
+}
+
 resource "null_resource" "cockroach-runner" {
   count = 3
 
@@ -40,14 +65,6 @@ resource "null_resource" "cockroach-runner" {
     destination = "/home/ubuntu/download_binary.sh"
   }
 
-  # This writes the filled-in supervisor template. It would be nice if we could
-  # use rendered templates in the file provisioner.
-#   provisioner "remote-exec" {
-#     inline = <<FILE
-# echo '${element(template_file.supervisor.*.rendered, count.index)}' > supervisor.conf
-# FILE
-#   }
-
   provisioner "file" {
     # If no binary is specified, we'll copy /dev/null (always 0 bytes) to the
     # instance. The "remote-exec" block will then overwrite that. There's no
@@ -60,14 +77,10 @@ resource "null_resource" "cockroach-runner" {
   provisioner "remote-exec" {
     inline = [
       "sudo apt-get -y update",
-      # "sudo apt-get -y install supervisor",
       "sudo apt-get -y install nethogs",
-      # "sudo service supervisor stop",
       "mkdir -p logs",
       "chmod 755 cockroach",
       "[ $(stat --format=%s cockroach) -ne 0 ] || sudo bash download_binary.sh cockroach/cockroach ${var.cockroach_sha}",
-      # "if [ ! -e supervisor.pid ]; then supervisord -c supervisor.conf; fi",
-      # "supervisorctl -c supervisor.conf start cockroach",
       "cockroach start --insecure --advertise-addr=${element(aws_instance.roach_instance.*.private_ip, count.index)} --join=${join(",", aws_instance.roach_instance.*.private_ip)} --cache=.25 --max-sql-memory=.25 --background"
     ]
   }
@@ -143,33 +156,6 @@ resource "aws_instance" "bastion_instance" {
 
 resource "aws_eip" "bastion_eip" {
   instance = aws_instance.bastion_instance.id
-
-  connection {
-    type = "ssh"
-    user = "ubuntu"
-    private_key = "${file("/home/abhilash/.ssh/yulu_assignment.pem")}"
-    host = "${self.public_ip}"
-  }
-
-  provisioner "file" {
-    source = "download_binary.sh"
-    destination = "/home/ubuntu/download_binary.sh"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo apt-get -y update",
-      # "sudo apt-get -y install supervisor",
-      "sudo apt-get -y install nethogs",
-      # "sudo service supervisor stop",
-      "mkdir -p logs",
-      "chmod 755 cockroach",
-      "[ $(stat --format=%s cockroach) -ne 0 ] || sudo bash download_binary.sh cockroach/cockroach ${var.cockroach_sha}",
-      # "if [ ! -e supervisor.pid ]; then supervisord -c supervisor.conf; fi",
-      # "supervisorctl -c supervisor.conf start cockroach",
-      "cockroach init --insecure --host=${aws_instance.roach_instance[0].private_ip}"
-    ]
-  }
 
   tags = {
     "Name" = "Bastion Elastic IP"
