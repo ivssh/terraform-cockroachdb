@@ -58,6 +58,9 @@ resource "null_resource" "cockroach-runner" {
   provisioner "remote-exec" {
     inline = [
       "sudo apt-get -y update",
+      "sudo apt install -y chrony",
+      "sudo sed  -i '1i server 169.254.169.123 prefer iburst minpoll 4 maxpoll 4' /etc/chrony/chrony.conf",
+      "sudo /etc/init.d/chrony restart",
       "sudo apt-get -y install nethogs",
       "mkdir -p logs",
       "chmod 755 cockroach",
