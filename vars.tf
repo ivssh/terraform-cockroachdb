@@ -68,6 +68,6 @@ variable "cockroach_sha" {
 }
 
 # Number of instances to start.
-variable "num_instances" {
-  default = 3
+variable "num_of_instances" {
+  default = 4
 }

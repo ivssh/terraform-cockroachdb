@@ -13,7 +13,7 @@ resource "aws_security_group" "roach_sg" {
     from_port   = 8008
     to_port     = 8080
     protocol    = "TCP"
-    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = ["${aws_security_group.bastion_sg.id}"]
   }
 
   ingress {
@@ -27,7 +27,7 @@ resource "aws_security_group" "roach_sg" {
     from_port   = 26257
     to_port     = 26257
     protocol    = "TCP"
-    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = ["${aws_security_group.bastion_sg.id}"]
   }
 
 }
