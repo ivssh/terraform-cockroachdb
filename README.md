@@ -43,3 +43,8 @@ Test the client connection to all the nodes through the loadbalancer
 ```sh
 $  cockroach node status --insecure --host=<private-DNS-of-internal-loadbalancer>
 ```
+#### References
+- https://www.cockroachlabs.com/docs/v20.1/deploy-cockroachdb-on-aws-insecure
+
+#### License
+This project is distributed under the Apache License Version 2.0
