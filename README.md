@@ -31,3 +31,15 @@ $ terraform init
 $ terraform plan -out=cockroach_cluster.tfplan
 $ terraform apply -var 'num_of_instaces=<any_integer>' "cockroach_cluster.tfplan"
 ```
+
+#### Testing the infrastructure
+
+Ssh into the bastion instance which is public facing
+```sh
+$ ssh -i <pem-file> ubuntu@<public-ip-of-bastion-instance>
+```
+
+Test the client connection to all the nodes through the loadbalancer
+```sh
+$  cockroach node status --insecure --host=<private-DNS-of-internal-loadbalancer>
+```
