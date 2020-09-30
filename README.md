@@ -12,7 +12,7 @@ Launch cockroachdb clusters in AWS using `remote` provisioners.
 ### Pre-requisites
 
   - Terraform installed
-  - AWS CLI configured
+  - AWS CLI installed and configured with access key and secret
   - Ensure the **pem file** is in `~/.ssh`
   - Add the public key of the corresponding pem file to `artifacts.tf` in `"aws_key_pair" "deployment"` resource
 
